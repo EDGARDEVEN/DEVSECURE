@@ -1,4 +1,3 @@
-// routes/auth.js
 const express = require('express');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
@@ -10,12 +9,13 @@ router.post('/register', (req, res, next) => {
   const { username, email, password } = req.body;
   const user = new User({ username, email, password });
 
-  user.save((err) => {
-    if (err) {
-      return next(err);
-    }
-    res.status(201).json({ message: 'User registered successfully' });
-  });
+  user.save()
+    .then(() => {
+      res.status(201).json({ message: 'User registered successfully' });
+    })
+    .catch((err) => {
+      next(err);
+    });
 });
 
 router.post('/login', (req, res, next) => {
