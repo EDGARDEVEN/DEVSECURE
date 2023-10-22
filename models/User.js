@@ -1,28 +1,14 @@
-// models/User.js
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const passportLocalMongoose = require('passport-local-mongoose');
 
 const userSchema = new mongoose.Schema({
   username: String,
-  email: String,
-  password: String,
+  password: String, // This is where the hashed password will be stored
 });
 
-// Hash the password before saving the user
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  try {
-    const hashed = await bcrypt.hash(this.password, 10);
-    this.password = hashed;
-    return next();
-  } catch (e) {
-    return next(e);
-  }
-});
+// Add passport-local-mongoose to your user schema
+userSchema.plugin(passportLocalMongoose);
 
-// Compare user passwords during login
-userSchema.methods.comparePassword = async function(candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
-};
+const User = mongoose.model('User', userSchema);
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = User;

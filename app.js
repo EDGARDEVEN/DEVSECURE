@@ -1,25 +1,64 @@
-// app.js
 const express = require('express');
 const passport = require('passport');
 const mongoose = require('mongoose');
+const session = require('express-session');
+const LocalStrategy = require('passport-local').Strategy;
 const authRoutes = require('./routes/auth');
+const User = require('./models/User');
 
-mongoose.connect('mongodb://localhost/your-database-name', {
+
+mongoose.connect('mongodb://127.0.0.1:27017/devsecure', {
   useNewUrlParser: true,
-  useCreateIndex: true,
   useUnifiedTopology: true,
 });
 
 const app = express();
 
+// Configure express-session middleware
+app.use(
+    session({
+      secret: 'spartan01', // Replace with a secure secret key
+      resave: false,
+      saveUninitialized: false,
+    })
+  );
+
 // Configure Passport
 app.use(passport.initialize());
+app.use(passport.session());
 
-// Define JWT strategy
-require('./controllers/authController');
+// Define a User model (you need to define this model)
+
+// Passport local strategy configuration
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 // Define routes
 app.use('/auth', authRoutes);
+
+// Define a default route for the root URL
+app.get('/', (req, res) => {
+  res.redirect('/landing');
+});
+
+// Define a landing page route
+app.get('/landing', (req, res) => {
+  res.sendFile(__dirname + '/views/landing.html');
+});
+
+// Define a dashboard page route (protected)
+app.get('/dashboard', isAuthenticated, (req, res) => {
+  res.sendFile(__dirname + '/views/dashboard.html');
+});
+
+// Middleware to check if a user is authenticated
+function isAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/auth/login');
+}
 
 // Handle connection events
 const db = mongoose.connection;
