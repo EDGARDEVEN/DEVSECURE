@@ -7,21 +7,24 @@ const authRoutes = require('./routes/auth');
 const User = require('./models/User');
 const bodyParser = require('body-parser');
 
-mongoose.connect('mongodb://127.0.0.1:27017/devsecure', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+require('dotenv').config();
+
+mongoose.connect(process.env.MONGODB_URI, { // remove hardcoded URI
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
 });
+
 
 const app = express();
 
 // Configure express-session middleware
 app.use(
     session({
-      secret: 'spartan01',
-      resave: false,
-      saveUninitialized: false,
+        secret: 'spartan01',
+        resave: false,
+        saveUninitialized: false,
     })
-  );
+);
 
 // Configure Passport
 app.use(passport.initialize());
@@ -40,41 +43,41 @@ app.use('/auth', authRoutes);
 
 // Define a default route for the root URL
 app.get('/', (req, res) => {
-  res.redirect('/landing');
+    res.redirect('/landing');
 });
 
 // Define a landing page route
 app.get('/landing', (req, res) => {
-  res.sendFile(__dirname + '/views/landing.html');
+    res.sendFile(__dirname + '/views/landing.html');
 });
 
 // Define login route
 app.get('/login', (req, res) => {
-  res.sendFile(__dirname + '/views/login.html');
+    res.sendFile(__dirname + '/views/login.html');
 });
 
 //Define register route
 app.get('/register', (req, res) => {
-  res.sendFile(__dirname + '/views/register.html');
+    res.sendFile(__dirname + '/views/register.html');
 });
 
 // Define a dashboard page route (protected)
 app.get('/dashboard', isAuthenticated, (req, res) => {
-  res.sendFile(__dirname + '/views/dashboard.html');
+    res.sendFile(__dirname + '/views/dashboard.html');
 });
 
 // Handle login form submission
 app.post('/login', passport.authenticate('local', {
     successRedirect: '/dashboard', // Redirect to the dashboard upon successful login
     failureRedirect: '/login',    // Redirect back to the login page if login fails
-  }));
+}));
 
 // Middleware to check if a user is authenticated
 function isAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.redirect('/auth/login');
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/auth/login');
 }
 
 // Handle connection events
@@ -82,9 +85,9 @@ const db = mongoose.connection;
 
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => {
-  console.log('Connected to MongoDB');
+    console.log('Connected to MongoDB');
 });
 
 app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+    console.log('Server is running on port 3000');
 });
