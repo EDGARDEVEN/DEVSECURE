@@ -6,10 +6,21 @@ const LocalStrategy = require('passport-local').Strategy;
 const authRoutes = require('./routes/auth');
 const User = require('./models/User');
 const bodyParser = require('body-parser');
+<<<<<<< HEAD
 
 mongoose.connect('mongodb://127.0.0.1:27017/devsecure', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+=======
+// import database connection string
+const dotenv = require('dotenv');
+dotenv.config();
+
+
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+>>>>>>> cff1fca (Added support for Docker containers)
 });
 
 const app = express();
