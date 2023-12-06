@@ -1,12 +1,14 @@
-const Web3 = require('web3');
-const fs = require('fs');
+import fs from 'fs';
+import path from 'path';
+import Web3 from 'web3';
 
 // Connect to your local Ethereum node
 // Highlight bug in this line(web3 cannot be used as a constructor, i'll look for a solution)
-const web3 = new Web3('http://localhost:8545');
+const web3 = new Web3('http://localhost:8551');
 
 // Load the compiled smart contract ABI and bytecode
-const contractData = JSON.parse(fs.readFileSync('IdentityContract.json', 'utf8'));
+const filePath = '/home/carbanak/Desktop/DEVSECURE/scripts/IdentityContract.json';
+const contractData = JSON.parse(fs.readFileSync(filePath, 'utf8'))
 const abi = contractData.abi;
 const bytecode = contractData.bytecode;
 
